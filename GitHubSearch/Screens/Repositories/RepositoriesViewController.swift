@@ -40,36 +40,41 @@ class RepositoriesViewController: BaseViewController {
         tableView.tableFooterView = UIView()
     }
     
-    private func loadRepositories(withString string: String) {
-        showActivityIndicator()
-        
-        NetworkService.getRepositories(withString: string) { [weak self] result in
-            DispatchQueue.main.async { [weak self] in
-                self?.hideActivityIndicator()
-                self?.handleRepositoriesFetched(result)
-            }
-        }
-    }
-    
     // TODO: Bad impementation
     // TODO: Add Error case (403)
     private func handleRepositoriesFetched(_ repositories: Repositories?) {
-        guard let fetchedRepositories = repositories?.items else {
-            emptyListLabel.text = "Error occured"
+        guard let fetchedRepositories = repositories?.items, !fetchedRepositories.isEmpty else {
+            emptyListLabel.text = "Nothing found"
             emptyListLabel.isHidden = false
             self.repositories = []
             return
         }
         
-        guard !fetchedRepositories.isEmpty else {
-            emptyListLabel.text = "Nothing found"
-            emptyListLabel.isHidden = false
-            self.repositories = fetchedRepositories
-            return
-        }
-        
         self.repositories = fetchedRepositories
         emptyListLabel.isHidden = true
+    }
+    
+    private func handleError(_ error: NSError) {
+        emptyListLabel.text = "Error occured"
+        emptyListLabel.isHidden = false
+        self.repositories = []
+    }
+    
+    // MARK: API
+    
+    private func loadRepositories(withString string: String) {
+        showActivityIndicator()
+        
+        NetworkService.getRepositories(withString: string) { [weak self] result, error in
+            DispatchQueue.main.async { [weak self] in
+                self?.hideActivityIndicator()
+                if let error = error {
+                    self?.handleError(error)
+                } else {
+                    self?.handleRepositoriesFetched(result)
+                }
+            }
+        }
     }
 
 }
