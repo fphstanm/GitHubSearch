@@ -40,8 +40,9 @@ class RepositoriesViewController: BaseViewController {
         tableView.tableFooterView = UIView()
     }
     
-    // TODO: Bad impementation
-    // TODO: Add Error case (403)
+    // MARL: Handlers
+    
+    // FIXME: Bad impementation
     private func handleRepositoriesFetched(_ repositories: Repositories?) {
         guard let fetchedRepositories = repositories?.items, !fetchedRepositories.isEmpty else {
             emptyListLabel.text = "Nothing found"
@@ -50,7 +51,8 @@ class RepositoriesViewController: BaseViewController {
             return
         }
         
-        self.repositories = fetchedRepositories
+        self.repositories = fetchedRepositories.sorted { $0.stargazersCount ?? 0 > $1.stargazersCount ?? 0 }
+        
         emptyListLabel.isHidden = true
     }
     
