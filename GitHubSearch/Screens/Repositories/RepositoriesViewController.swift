@@ -73,6 +73,7 @@ class RepositoriesViewController: BaseViewController {
                 if let error = error {
                     self?.handleError(error)
                 } else {
+                    guard result != nil else { return }
                     self?.handleRepositoriesFetched(result)
                 }
             }
@@ -86,6 +87,7 @@ class RepositoriesViewController: BaseViewController {
 extension RepositoriesViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         guard !searchText.isEmpty else { return repositories = [] }
+        emptyListLabel.text = ""
         loadRepositories(withString: searchText)
     }
     
@@ -103,8 +105,8 @@ extension RepositoriesViewController: UITableViewDataSource {
 
         let repository = repositories[indexPath.row]
         let cellModel = RepositoryCellModel(name: repository.fullName ?? "",
-                                        description: repository.description,
-                                        starsCount: repository.stargazersCount ?? 1)
+                                            description: repository.description,
+                                            starsCount: repository.stargazersCount ?? 1)
         
         cell.setup(with: cellModel)
         
